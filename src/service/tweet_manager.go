@@ -1,15 +1,20 @@
 package service
 
-import (
-	"fmt"
-)
+import "github.com/marianobarragan/Twitter/src/domain"
+import "time"
 
-var Tweet string;
+var tweet *domain.Tweet;
 
-func PublishTweet(tweet string){
-	Tweet = tweet
+func PublishTweet(tweet_p *domain.Tweet){
+	tweet = tweet_p;
+	t := time.Now()
+	tweet.Date = &t;
 }
 
-func main() {
-	fmt.Println("Hola a todos")
+func GetTweet() *domain.Tweet{
+	return tweet
 }
+
+
+
+
