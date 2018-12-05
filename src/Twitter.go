@@ -29,8 +29,12 @@ func main() {
 
 			newTweet := domain.NewTweet(username,tweet);
 
-			service.PublishTweet(newTweet)
+			err := service.PublishTweet(newTweet)
 
+			if (err != nil) {
+				c.Print(err)
+				return
+			}
 			c.Print("Tweet sent\n")
 
 			return
