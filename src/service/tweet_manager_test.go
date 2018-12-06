@@ -29,9 +29,6 @@ func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
 	// Validation
 	publishedTweet := service.GetTweet(0)
-	//if publishedTweet.User != user || publishedTweet.Text != text {
-	//	t.Errorf("Expected tweet is %s: %s \n but is %s: %s", user, text, publishedTweet.User, publishedTweet.Text)
-	//}
 	assert.True(t, isValidTweet(t,publishedTweet,user,text), "Tweet is valid!")
 	assert.NotNil(t, publishedTweet.Date)
 }
@@ -114,13 +111,8 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T){
 	assert.True(t,len(publishedTweets)==2, "Expected size is 2")
 	firstPublishedTweet := publishedTweets[0]
 	secondPublishedTweet := publishedTweets[1]
-	if !isValidTweet(t, firstPublishedTweet, user, text){
-		return
-	}
-	if !isValidTweet(t, secondPublishedTweet, user, text){
-		return
-	}
-
+	assert.True(t,isValidTweet(t, firstPublishedTweet, user, text),"first tweet is valid")
+	assert.True(t,isValidTweet(t, secondPublishedTweet, user, text),"first tweet is valid")
 }
 
 func TestCanRetrieveTweetById(t *testing.T){
@@ -133,10 +125,7 @@ func TestCanRetrieveTweetById(t *testing.T){
 	text := "This is my first tweet"
 
 	tweet = domain.NewTweet(user, text)
-
 	id, _ = service.PublishTweet(tweet)
-
 	publishedTweet := service.GetTweetById( id )
-
-	isValidTweet(t, publishedTweet, user,   text )
+	assert.True(t,isValidTweet(t, publishedTweet, user,   text ),"tweet obtained by id is valid")
 }

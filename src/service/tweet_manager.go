@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/marianobarragan/Twitter/src/domain"
 )
 import "time"
@@ -51,11 +50,10 @@ func GetTweets() []*domain.Tweet{
 
 func GetTweetById(id int) *domain.Tweet{
 
-	for i := 0; i < len(tweets) ; i ++{
-		if tweets[i].Id == id {
-			return tweets[i]
+	for _, tweet := range tweets {
+		if tweet.Id == id {
+			return tweet
 		}
-		fmt.Println(i)
 	}
 	return nil
 }
