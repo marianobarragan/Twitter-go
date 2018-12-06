@@ -3,8 +3,17 @@ package service_test
 import (
 	"github.com/marianobarragan/Twitter/src/domain"
 	"github.com/marianobarragan/Twitter/src/service"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func isValidTweet(t * testing.T, publishedTweet *domain.Tweet,user string, text string) bool{
+	if publishedTweet.User != user || publishedTweet.Text != text {
+		t.Errorf("Expected tweet is %s: %s \n but is %s: %s", user, text, publishedTweet.User, publishedTweet.Text)
+		return false
+	}
+	return true
+}
 
 func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
@@ -19,14 +28,12 @@ func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 	service.PublishTweet(tweet)
 
 	// Validation
-	publishedTweet := service.GetTweet()
-	if publishedTweet.User != user || publishedTweet.Text != text {
-		t.Errorf("Expected tweet is %s: %s \n but is %s: %s", user, tweet, publishedTweet.User, publishedTweet.Text)
-	}
-
-	if publishedTweet.Date == nil {
-		t.Error("Expected date can't be nil")
-	}
+	publishedTweet := service.GetTweet(0)
+	//if publishedTweet.User != user || publishedTweet.Text != text {
+	//	t.Errorf("Expected tweet is %s: %s \n but is %s: %s", user, text, publishedTweet.User, publishedTweet.Text)
+	//}
+	assert.True(t, isValidTweet(t,publishedTweet,user,text), "Tweet is valid!")
+	assert.NotNil(t, publishedTweet.Date)
 }
 
 func TestTweetWithoutUser(t *testing.T){
@@ -39,12 +46,13 @@ func TestTweetWithoutUser(t *testing.T){
 
 	// Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_ , err = service.PublishTweet(tweet)
 
 	// Validation
-	if err != nil && err.Error() != "user is required" {
-		t.Error("Expected error is required")
-	}
+	//if err != nil && err.Error() != "user is required" {
+	//	t.Error("Expected error is required")
+	//}
+	assert.True(t,err != nil, "user is required")
 }
 
 func TestTweetWithoutTextIsNotPublished(t *testing.T){
@@ -57,12 +65,13 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T){
 
 	// Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_ , err = service.PublishTweet(tweet)
 
 	// Validation
-	if err != nil && err.Error() != "text is required" {
-		t.Error("Expected error is required")
-	}
+	//if err != nil && err.Error() != "text is required" {
+	//	t.Error("Expected error is required")
+	//}
+	assert.True(t,err != nil, "text is required")
 }
 
 func TestTweetWithoExceeding140CharactersIsNotPublished(t *testing.T){
@@ -75,10 +84,59 @@ func TestTweetWithoExceeding140CharactersIsNotPublished(t *testing.T){
 
 	// Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_ , err = service.PublishTweet(tweet)
 
 	// Validation
-	if err != nil && err.Error() != "text is too long" {
-		t.Error("Expected error is required")
+	//if err != nil && err.Error() != "text is too long" {
+	//	t.Error("Expected error is required")
+	//}
+	assert.True(t,err != nil, "text is too long")
+}
+
+func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T){
+
+	// Initialization
+	service.InitializeService()
+	user := "user"
+	text := "text"
+	var firstTweet, secondTweet * domain.Tweet // Fill tweets with data
+
+	firstTweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, text)
+
+	// Operation
+	service.PublishTweet(firstTweet)
+	service.PublishTweet(secondTweet)
+
+	// Validation
+	publishedTweets := service.GetTweets()
+
+	assert.True(t,len(publishedTweets)==2, "Expected size is 2")
+	firstPublishedTweet := publishedTweets[0]
+	secondPublishedTweet := publishedTweets[1]
+	if !isValidTweet(t, firstPublishedTweet, user, text){
+		return
 	}
+	if !isValidTweet(t, secondPublishedTweet, user, text){
+		return
+	}
+
+}
+
+func TestCanRetrieveTweetById(t *testing.T){
+	service.InitializeService()
+
+	var tweet *domain.Tweet
+	var id int
+
+	user := "grupoesfera"
+	text := "This is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
+
+	id, _ = service.PublishTweet(tweet)
+
+	publishedTweet := service.GetTweetById( id )
+
+	isValidTweet(t, publishedTweet, user,   text )
 }

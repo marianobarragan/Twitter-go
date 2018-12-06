@@ -29,7 +29,7 @@ func main() {
 
 			newTweet := domain.NewTweet(username,tweet);
 
-			err := service.PublishTweet(newTweet)
+			_ , err := service.PublishTweet(newTweet)
 
 			if (err != nil) {
 				c.Print(err)
@@ -48,9 +48,24 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			tweet := service.GetTweet()
+			tweet := service.GetTweet(0)
 
 			c.Println(tweet)
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "showAllTweets",
+		Help: "Shows all tweets",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			tweets := service.GetTweets()
+
+			c.Println(tweets)
 
 			return
 		},
