@@ -12,6 +12,8 @@ func main() {
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
 
+	service.InitializeService()
+
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
 		Help: "Publishes a tweet",
@@ -31,7 +33,7 @@ func main() {
 
 			_ , err := service.PublishTweet(newTweet)
 
-			if (err != nil) {
+			if err != nil {
 				c.Print(err)
 				return
 			}
@@ -65,7 +67,9 @@ func main() {
 
 			tweets := service.GetTweets()
 
-			c.Println(tweets)
+			for _, tweet := range tweets{
+				c.Printf("Tweet: %s - Author: %s - Date: %s \n", tweet.Text, tweet.User, tweet.Date)
+			}
 
 			return
 		},
@@ -85,6 +89,27 @@ func main() {
 			count := service.CountTweetsByUser(username)
 
 			c.Println(count)
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "showUserTweets",
+		Help: "Shows all tweets",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Username: ")
+
+			username  := c.ReadLine()
+
+			tweets := service.GetTweetsByUser(username)
+
+			for _, tweet := range tweets{
+				c.Printf("Tweet: %s - Author: %s - Date: %s \n", tweet.Text, tweet.User, tweet.Date)
+			}
 
 			return
 		},

@@ -7,10 +7,12 @@ import "time"
 import "errors"
 
 var tweets []*domain.Tweet
+var tweetsByUser map[string][]*domain.Tweet
 var idCounter int
 
 func InitializeService(){
 	tweets = make([]* domain.Tweet, 0) // Crea un slice vacío
+	tweetsByUser = make(map [string][]*domain.Tweet)
 }
 
 func PublishTweet(tweet_p *domain.Tweet) (id int, error error){
@@ -34,6 +36,13 @@ func PublishTweet(tweet_p *domain.Tweet) (id int, error error){
 	idCounter ++
 	tweet_p.Id = id
 	tweets = append(tweets, tweet_p)
+	//if _, exists := tweetsByUser[tweet_p.User]; !exists {
+	//	tweetsByUser[tweet_p.User] = make([]* domain.Tweet, 0)
+	//	tweetsByUser[tweet_p.User] =
+	//} else {
+	//	tweetsByUser[tweet_p.User] = append(tweetsByUser[tweet_p.User], tweet_p)
+	//}
+	tweetsByUser[tweet_p.User] = append(tweetsByUser[tweet_p.User], tweet_p)
 	return id, nil
 }
 
@@ -68,5 +77,14 @@ func CountTweetsByUser(user string) (count int)  {
 	return
 }
 
+func GetTweetsByUser(username string) (userTweets []*domain.Tweet){
 
+	//for _, tweet := range tweets {
+	//	if tweet.User == username {
+	//		userTweets = append(userTweets, tweet)
+	//	}
+	//}
+	userTweets = tweetsByUser[username];
+	return
+}
 

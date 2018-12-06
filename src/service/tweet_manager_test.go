@@ -18,6 +18,7 @@ func isValidTweet(t * testing.T, publishedTweet *domain.Tweet,user string, text 
 func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
 	// Initialization
+	service.InitializeService()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	text := "This is my first tweet"
@@ -35,6 +36,7 @@ func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
 func TestTweetWithoutUser(t *testing.T){
 	// Initialization
+	service.InitializeService()
 	var tweet * domain.Tweet
 	var user string;
 	text := "This is my first tweet"
@@ -54,6 +56,7 @@ func TestTweetWithoutUser(t *testing.T){
 
 func TestTweetWithoutTextIsNotPublished(t *testing.T){
 	// Initialization
+	service.InitializeService()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	var text string
@@ -73,6 +76,7 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T){
 
 func TestTweetWithoExceeding140CharactersIsNotPublished(t *testing.T){
 	// Initialization
+	service.InitializeService()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	text := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
@@ -148,4 +152,34 @@ func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 	count := service.CountTweetsByUser(user)
 	// Validation
 	assert.True(t, count ==2, "Expected count is 2")
+}
+
+func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
+	// Initialization
+	service.InitializeService()
+	var firstTweet, secondTweet, thirdTweet *domain.Tweet
+	user := "grupoesfera"
+	anotherUser := "nick"
+	text := "This is my first tweet"
+	secondText := "This is my second tweet"
+	thirdText := "This is my third tweet"
+	firstTweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, thirdText)
+	// publish the 3 tweets
+	service.PublishTweet(firstTweet)
+	service.PublishTweet(secondTweet)
+	service.PublishTweet(thirdTweet)
+	// Operation
+	tweets := service.GetTweetsByUser(user)
+
+	// Validation
+	assert.True(t, len(tweets) == 2, "must return 2 tweets")
+	firstPublishedTweet := tweets[0]
+	secondPublishedTweet := tweets[1]
+
+	assert.True(t,firstPublishedTweet == firstTweet, "same tweets")
+	assert.True(t,secondPublishedTweet == secondTweet, "same tweets")
+	assert.True(t,isValidTweet(t, firstPublishedTweet, user,   text ),"tweet obtained by username is valid")
+	assert.True(t,isValidTweet(t, secondPublishedTweet, user,   secondText ),"tweet obtained by username is valid")
 }
