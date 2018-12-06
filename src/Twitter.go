@@ -12,7 +12,7 @@ func main() {
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
 
-	service.InitializeService()
+	service := service.NewTweetManager()
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
@@ -52,7 +52,7 @@ func main() {
 
 			tweet := service.GetTweet(0)
 
-			c.Println(tweet)
+			c.Println(tweet.PrintableTweet())
 
 			return
 		},
@@ -68,7 +68,7 @@ func main() {
 			tweets := service.GetTweets()
 
 			for _, tweet := range tweets{
-				c.Printf("Tweet: %s - Author: %s - Date: %s \n", tweet.Text, tweet.User, tweet.Date)
+				c.Printf(tweet.PrintableTweet())
 			}
 
 			return
@@ -108,7 +108,7 @@ func main() {
 			tweets := service.GetTweetsByUser(username)
 
 			for _, tweet := range tweets{
-				c.Printf("Tweet: %s - Author: %s - Date: %s \n", tweet.Text, tweet.User, tweet.Date)
+				c.Printf(tweet.PrintableTweet())
 			}
 
 			return

@@ -18,7 +18,7 @@ func isValidTweet(t * testing.T, publishedTweet *domain.Tweet,user string, text 
 func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	text := "This is my first tweet"
@@ -36,7 +36,7 @@ func TestPublishedTweetIsSaved(t *testing.T) { // importo de testing el tipo T
 
 func TestTweetWithoutUser(t *testing.T){
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var tweet * domain.Tweet
 	var user string;
 	text := "This is my first tweet"
@@ -56,7 +56,7 @@ func TestTweetWithoutUser(t *testing.T){
 
 func TestTweetWithoutTextIsNotPublished(t *testing.T){
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	var text string
@@ -76,7 +76,7 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T){
 
 func TestTweetWithoExceeding140CharactersIsNotPublished(t *testing.T){
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var tweet * domain.Tweet
 	user := "grupooesfera"
 	text := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
@@ -97,7 +97,7 @@ func TestTweetWithoExceeding140CharactersIsNotPublished(t *testing.T){
 func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T){
 
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	user := "user"
 	text := "text"
 	var firstTweet, secondTweet * domain.Tweet // Fill tweets with data
@@ -120,7 +120,7 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T){
 }
 
 func TestCanRetrieveTweetById(t *testing.T){
-	service.InitializeService()
+	service := service.NewTweetManager()
 
 	var tweet *domain.Tweet
 	var id int
@@ -136,7 +136,7 @@ func TestCanRetrieveTweetById(t *testing.T){
 
 func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var tweet, secondTweet, thirdTweet *domain.Tweet
 	user := "grupoesfera"
 	anotherUser := "nick"
@@ -156,7 +156,7 @@ func TestCanCountTheTweetsSentByAnUser(t *testing.T) {
 
 func TestCanRetrieveTheTweetsSentByAnUser(t *testing.T) {
 	// Initialization
-	service.InitializeService()
+	service := service.NewTweetManager()
 	var firstTweet, secondTweet, thirdTweet *domain.Tweet
 	user := "grupoesfera"
 	anotherUser := "nick"

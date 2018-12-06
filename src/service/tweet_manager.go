@@ -6,16 +6,20 @@ import (
 import "time"
 import "errors"
 
-var tweets []*domain.Tweet
-var tweetsByUser map[string][]*domain.Tweet
-var idCounter int
-
-func InitializeService(){
-	tweets = make([]* domain.Tweet, 0) // Crea un slice vacío
-	tweetsByUser = make(map [string][]*domain.Tweet)
+type TweetManager struct {
+	tweets []*domain.Tweet
+	tweetsByUser map[string][]*domain.Tweet
+	idCounter int
 }
 
-func PublishTweet(tweet_p *domain.Tweet) (id int, error error){
+func NewTweetManager() *TweetManager {
+	var tweetManager = new (TweetManager)
+	tweetManager.tweets = make([]* domain.Tweet, 0) // Crea un slice vacío
+	tweetManager.tweetsByUser = make(map [string][]*domain.Tweet)
+	return tweetManager
+}
+
+func (tweetManager * TweetManager) PublishTweet(tweet_p *domain.Tweet) (id int, error error){
 
 	if len(tweet_p.User) == 0 {
 		error = errors.New("user is required")
@@ -32,34 +36,34 @@ func PublishTweet(tweet_p *domain.Tweet) (id int, error error){
 
 	t := time.Now()
 	tweet_p.Date = &t
-	id = idCounter
-	idCounter ++
+	id = tweetManager.idCounter
+	tweetManager.idCounter ++
 	tweet_p.Id = id
-	tweets = append(tweets, tweet_p)
+	tweetManager.tweets = append(tweetManager.tweets, tweet_p)
 	//if _, exists := tweetsByUser[tweet_p.User]; !exists {
 	//	tweetsByUser[tweet_p.User] = make([]* domain.Tweet, 0)
 	//	tweetsByUser[tweet_p.User] =
 	//} else {
 	//	tweetsByUser[tweet_p.User] = append(tweetsByUser[tweet_p.User], tweet_p)
 	//}
-	tweetsByUser[tweet_p.User] = append(tweetsByUser[tweet_p.User], tweet_p)
+	tweetManager.tweetsByUser[tweet_p.User] = append(tweetManager.tweetsByUser[tweet_p.User], tweet_p)
 	return id, nil
 }
 
-func GetTweet(position int) *domain.Tweet{
-	if position < len(tweets) {
-		return tweets[position]
+func (tweetManager * TweetManager) GetTweet(position int) *domain.Tweet{
+	if position < len(tweetManager.tweets) {
+		return tweetManager.tweets[position]
 	}
 	return nil
 }
 
-func GetTweets() []*domain.Tweet{
-	return tweets
+func (tweetManager * TweetManager) GetTweets() []*domain.Tweet{
+	return tweetManager.tweets
 }
 
-func GetTweetById(id int) *domain.Tweet{
+func (tweetManager * TweetManager) GetTweetById(id int) *domain.Tweet{
 
-	for _, tweet := range tweets {
+	for _, tweet := range tweetManager.tweets {
 		if tweet.Id == id {
 			return tweet
 		}
@@ -67,9 +71,9 @@ func GetTweetById(id int) *domain.Tweet{
 	return nil
 }
 
-func CountTweetsByUser(user string) (count int)  {
+func (tweetManager * TweetManager) CountTweetsByUser(user string) (count int)  {
 
-	for _, tweet := range tweets {
+	for _, tweet := range tweetManager.tweets {
 		if tweet.User == user {
 			count ++
 		}
@@ -77,14 +81,13 @@ func CountTweetsByUser(user string) (count int)  {
 	return
 }
 
-func GetTweetsByUser(username string) (userTweets []*domain.Tweet){
+func (tweetManager * TweetManager) GetTweetsByUser(username string) (userTweets []*domain.Tweet){
 
 	//for _, tweet := range tweets {
 	//	if tweet.User == username {
 	//		userTweets = append(userTweets, tweet)
 	//	}
 	//}
-	userTweets = tweetsByUser[username];
+	userTweets = tweetManager.tweetsByUser[username];
 	return
 }
-
