@@ -2,21 +2,29 @@ package service
 
 import (
 	"github.com/marianobarragan/Twitter/src/domain"
+	"github.com/marianobarragan/Twitter/src/persistency"
+	"strings"
 )
 import "time"
 import "errors"
 
 type TweetManager struct {
-	tweets []domain.Tweet
+	tweets       []domain.Tweet
 	tweetsByUser map[string][]domain.Tweet
-	idCounter int
+	idCounter    int
+	fileWriter   persistency.TweetWriter
 }
 
-func NewTweetManager() *TweetManager {
-	var tweetManager = new (TweetManager)
+func NewTweetManager( aFileWriter persistency.TweetWriter) *TweetManager {
+	var tweetManager = new(TweetManager)
 	tweetManager.tweets = make([] domain.Tweet, 0) // Crea un slice vacío
-	tweetManager.tweetsByUser = make(map [string][]domain.Tweet)
+	tweetManager.tweetsByUser = make(map[string][]domain.Tweet)
+	tweetManager.fileWriter = aFileWriter
 	return tweetManager
+}
+
+func NewMemoryTweetWriter () *persistency.MemoryTweetWriter{
+	return new(persistency.MemoryTweetWriter)
 }
 
 func (tweetManager * TweetManager) PublishTweet(tweet domain.Tweet) (id int, error error){
@@ -55,28 +63,47 @@ func (tweetManager * TweetManager) PublishTweet(tweet domain.Tweet) (id int, err
 	tweet.SetId(id)
 	tweetManager.tweets = append(tweetManager.tweets, tweet)
 	tweetManager.tweetsByUser[tweet.GetUser()] = append(tweetManager.tweetsByUser[tweet.GetUser()], tweet)
+
+	if tweetManager.fileWriter != nil {tweetManager.fileWriter.Write(tweet) }
 	return id, nil
 }
 
-func (tweetManager * TweetManager) GetTweet(position int) domain.Tweet{
+func (tweetManager *TweetManager) SearchTweetsContaining(query string, tweetsFound chan domain.Tweet){
+	go func(){
+		time.Sleep(3 * time.Second)
+		for _, tweet := range tweetManager.GetTweets() {
+			if strings.Contains(tweet.GetText(),query)  {
+				tweetsFound <- tweet
+			}
+		}
+	}()
+}
+
+
+func (tweetManager * TweetManager) GetTweet(position int) (tweet domain.Tweet, err error){
 	if position < len(tweetManager.tweets) {
-		return tweetManager.tweets[position]
+		tweet = tweetManager.tweets[position]
+		return
 	}
-	return nil
+	err = errors.New("can't find tweet")
+
+	return
 }
 
 func (tweetManager * TweetManager) GetTweets() []domain.Tweet{
 	return tweetManager.tweets
 }
 
-func (tweetManager * TweetManager) GetTweetById(id int) domain.Tweet{
+func (tweetManager * TweetManager) GetTweetById(id int) (foundTweet domain.Tweet, err error){
 
 	for _, tweet := range tweetManager.tweets {
 		if tweet.GetId() == id {
-			return tweet
+			foundTweet = tweet
+			return
 		}
 	}
-	return nil
+	err = errors.New("can't find tweet with such id")
+	return
 }
 
 func (tweetManager * TweetManager) CountTweetsByUser(user string) (count int)  {

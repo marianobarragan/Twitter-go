@@ -20,8 +20,8 @@ type Tweet interface {
 /************************************************************/
 
 type TextTweet struct {
-	User string
-	Text string
+	User string `json:"user"`
+	Text string `json:"text"`
 	Date *time.Time
 	Id int
 }
