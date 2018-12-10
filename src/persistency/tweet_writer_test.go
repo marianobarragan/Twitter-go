@@ -76,3 +76,19 @@ func TestCanSearchForTweetContainingText(t *testing.T) {
 	assert.False(t, foundTweet == nil)
 	assert.True(t, strings.Contains(foundTweet.GetText(), query))
 }
+
+func BenchmarkPublishTweetWithMemoryWriter(b *testing.B){
+	// Initialization
+	// var tweetWriter = new(FileTweetWriterMocked)
+	tweetWriter := service.NewMemoryTweetWriter()
+	tweetManager := service.NewTweetManager(tweetWriter)
+	// Create and publish a tweet
+	var tweet * domain.TextTweet
+	user := "grupooesfera"
+	text := "This is my first tweet"
+	tweet = domain.NewTextTweet(user, text)
+
+	for n  := 0 ; n > b.N; n++ {
+		tweetManager.PublishTweet(tweet)
+	}
+}
